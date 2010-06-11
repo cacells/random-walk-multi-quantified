@@ -21,7 +21,7 @@ public class ResultsPrinter {
 		c = orig;
 		//set date and create directory?
 	}
-public void printLaTeX(){
+public void printLaTeX(int ind){
 
 		try {
 			java.io.FileWriter file = new java.io.FileWriter(new File(dir,latexFilename));
@@ -68,9 +68,9 @@ public void printLaTeX(){
 			buffer.write("\\et\n");
 			buffer.write("\\colorbox{descriptbg}{\\large{Measured Values}}\n");
 			buffer.write("\\bt\n");
-			buffer.write("average distance travelled in "+c.maxit+" moves &  " +twoPlaces.format(c.runStats[2])+"\\\\\n");
-			buffer.write("average square distance for "+c.maxit+" moves & " +twoPlaces.format(c.runStats[3])+"\\\\\n");
-			buffer.write("maximum frequency of distance & " +twoPlaces.format(c.runStats[4])+"\n");
+			buffer.write("average distance travelled in "+c.maxit+" moves &  " +twoPlaces.format(c.saved[ind].cellStats[0])+"\\\\\n");
+			buffer.write("average square distance for "+c.maxit+" moves & " +twoPlaces.format(c.saved[ind].cellStats[1])+"\\\\\n");
+			buffer.write("maximum frequency of distance & " +twoPlaces.format(c.saved[ind].cellStats[2])+"\n");
 			buffer.write("\\et\n");
 			buffer.write("\\colorbox{descriptbg}{\\large{Visualisation of results}}\n");
 			buffer.write("\\begin{figure}[htbp]\n");
@@ -167,11 +167,11 @@ public void printLaTeX(){
 	    latexFilename = baseFilename+"_results.tex";
 	    cssFilename = baseFilename+".css";
 	}
-	public void printEPSDots() {
+	public void printEPSDots(int ind) {
 		int xx;
 		int yy;
 		int xsize = c.gSize*4;
-		int ysize = c.maxdCount*4 + 20;
+		int ysize = c.saved[ind].maxdCount*4 + 20;
 		int ysize2 = (c.maxit-1)*4 +10;
 		xsize = xsize + 30;
 		double[] col = new double[3];//tmp colour holder
@@ -193,7 +193,8 @@ public void printLaTeX(){
 			buffer.newLine();
 			buffer.write("%%EndComments");
 			buffer.newLine();
-			buffer.write("/lg {0.9 0.9 0.9 setrgbcolor} bind def\n");
+			col = c.CApicture.EPScolor;
+			buffer.write("/lg {"+col[0]+" "+col[1]+" "+col[2]+" setrgbcolor} bind def\n");
 			for (xx = 0;xx < c.nnw+1; xx++){
                 col = c.epsColours[xx];
                 buffer.write("/sc"+xx+" {"+col[0]+" "+col[1]+" "+col[2]+" setrgbcolor} bind def\n");
@@ -205,19 +206,20 @@ public void printLaTeX(){
 			buffer.write("0 0 "+xsize+" "+(ysize+ysize2)+" drawrect\n");
 			buffer.write("lg\n");
 			buffer.write("5 5 "+(xsize-5)+" "+(ysize-5)+" fillrect\n");
-			buffer.write("sc1\n");//colour 1 is red
+			int a = (ind)%c.nnw+1;
+			buffer.write("sc"+a+"\n");//colour 1 is red
 			for (xx = 0; xx < c.gSize; xx++) {
-				for (yy = 0; yy < c.dCount[xx]; yy++) {
+				for (yy = 0; yy < c.saved[ind].dCount[xx]; yy++) {
 					buffer.write( (xx*4+10) + " " + (ysize-yy*4-10) + " dodot\n");
 				}
 			}
             buffer.write("0 "+ysize+" translate\n");
             System.out.println("runCount from epsprint"+c.runCount);
 			for (int i = 0; i < c.runCount; i++) {
-				xx = c.savedvals[i][0];
+				xx = c.saved[ind].posx[i][0];
 				buffer.write("newpath \n"+ (xx*4+10) + " " + (ysize2-10) + " moveto\n");
 				for (yy = 1; yy < c.maxit; yy++) {
-					xx = c.savedvals[i][yy];
+					xx = c.saved[ind].posx[i][yy];
 					buffer.write( (xx*4+10) + " " + (ysize2-yy*4-10) + " lineto\n");
 				}
 				buffer.write("stroke\n");

@@ -17,12 +17,12 @@ import java.util.*;
 public class CAStatic extends JFrame implements Runnable, ActionListener {
 
     CAGridStatic experiment;
-    int[][] savedvals;
+    //int[][] savedvals;
     int maxRun =100;
 	int maxit = 30;
-    int[] savedd;// = new int[maxRun];
-    int[] saveddsq;
-    int[] dCount;
+    //int[] savedd;// = new int[maxRun];
+    //int[] saveddsq;
+    //int[] dCount;
     int runCount = 0;
     int epsCount = 0;
     int newframe = 0;
@@ -42,8 +42,8 @@ public class CAStatic extends JFrame implements Runnable, ActionListener {
 	int maxCellType;
 	int maxdCount = 0;
 	int lastDrawn = 0;
-	int lin = 1;
-	int linx = maxit + 1;
+	//int lin = 1;
+	//int linx = maxit + 1;
 
 	boolean started = false;
     Colour palette = new Colour();
@@ -55,7 +55,8 @@ public class CAStatic extends JFrame implements Runnable, ActionListener {
     String EPSFilename = "file.eps";
     int rowstoDraw = 60;
     ResultsPrinter outPrinter;
-    double[] runStats = new double[6];
+    double[] runStats = new double[2];
+    Results[] saved;
     
     
 	public CAStatic(int size) {
@@ -63,6 +64,7 @@ public class CAStatic extends JFrame implements Runnable, ActionListener {
 		//size is the size of the area containing cells
 		dsize = size;
 	    gSize=size+2*maxit;
+
 	    int wscale = 6;//scale for main panel
 	    int btnHeight = 480-384;//found by trial and error - must be a better way!
 
@@ -123,8 +125,8 @@ public class CAStatic extends JFrame implements Runnable, ActionListener {
 		setVisible(true);
 		setpalette();
 		iterations = 0;
-		savedvals = new int[maxRun][maxit];
 		outPrinter = new ResultsPrinter(this);
+
 		
 	}
 	
@@ -142,84 +144,43 @@ public class CAStatic extends JFrame implements Runnable, ActionListener {
 	
 	public void saveCA() {
 		int a;
-		int xv,yv;
-		yv = iterations;
 		//iterations should be correct to use as array ref
 		//backGr1.fillRect(0, 0, this.getSize().width, this.getSize().height);
 		for (CACell c : experiment.tissue){
-			xv = c.home.x;
-			a = c.lineage;
+			a = c.lineage - 1;//lineage is 1 based
 			//savedvals[xv][yv] = a;
-			if (a == lin){
-			if (iterations == 0) linx = c.home.x;
 			if (c.type == 1){
-				experiment.savedx[iterations] = c.home.x;
-				experiment.savedy[iterations] = iterations;
-			}
+				saved[a].posx[runCount][iterations] = c.home.x;
 			}
 		}
 	}
-	public void saveCA2() {
-		int a;
-		int xv,yv;
-		yv = iterations;
-		//iterations should be correct to use as array ref
-		//backGr1.fillRect(0, 0, this.getSize().width, this.getSize().height);
-		for (CACell c : experiment.tissue){
-			if (c.type == 1){
-			xv = c.home.x;
-			a = c.lineage;
-			//savedvals[xv][yv] = a;
-			
-			//up to here
-			if (iterations == 0) linx = c.home.x;
+
 	
-				experiment.savedx[iterations] = c.home.x;
-				experiment.savedy[iterations] = iterations;
-			}
-			}
-	}
-	
-	public void saveStats() {
-        int val,ind;
-		java.io.FileWriter file;
-		//backGr1.fillRect(0, 0, this.getSize().width, this.getSize().height);
-		//System.out.println("iterations "+iterations);
-		ind = experiment.savedx[iterations-1];//should be maxit-1 but might get aborted?
-        val = ind - linx;
-		savedd[runCount] = val;
-		saveddsq[runCount] = val*val;
-		dCount[ind]++;
-		drawCount(ind);
-        for (int i=0;i<iterations;i++) savedvals[runCount][i] = experiment.savedx[i];
+	public void saverunStats() {
+        for (int i=0;i<experiment.maxlineage;i++) saved[i].setrunStats(runCount, maxit-1);
+		drawCount(dsize-1);//well, you can only draw 1 of them
 	}
 	
 	public void showStats(){
 		DecimalFormat twoPlaces = new DecimalFormat("0.00");
-		int sumd = 0,sumdsq = 0;
-		int maxd = 0,mind=gSize-1;
 		double p,q;
         maxdCount = 0;
+        Results r;
         p = CAGridStatic.params.pr;
         q = CAGridStatic.params.pl;
-		for (int i=0;i<gSize;i++) if (dCount[i] > maxdCount) maxdCount = dCount[i];
-		for (int i=0;i<runCount;i++){
-			sumd = sumd + savedd[i];
-			sumdsq = sumdsq + saveddsq[i];
-			if (savedd[i] < mind) mind = savedd[i];
-			if (savedd[i] > maxd) maxd = savedd[i];
-		}
+
 		runStats[0] = maxit*(p-q);//expected d
 		runStats[1] = (maxit*(p+q) + maxit*(maxit-1)*Math.pow(p-q, 2.0));//expected dsq
-		runStats[2] = (double)sumd/(double)(runCount);//av d from this run
-		runStats[3] = ((double)sumdsq)/((double)(runCount));
-		runStats[4] = maxdCount;
-		
-		if (runCount > 0){
 		System.out.println("expected d: "+ twoPlaces.format(runStats[0]) +" expected dsq " + twoPlaces.format(runStats[1]));
-		System.out.println("av d: "+twoPlaces.format(runStats[2])+" av d sq "+twoPlaces.format(runStats[3]));
-		System.out.println("range of d: "+ mind + " to " + maxd);
-		System.out.println("maxdCount " + maxdCount);
+
+        for (int i=0;i<experiment.maxlineage;i++) {
+        	r = saved[i];
+        	r.calcStats(runCount);
+        	
+		System.out.println("cell "+r.lineage+" av d: "+twoPlaces.format(r.cellStats[0])+" av d sq "+twoPlaces.format(r.cellStats[1]));
+		System.out.println("range of d: "+ r.mind + " to " + r.maxd);
+		System.out.println("maxdCount " + r.maxdCount);
+        }
 		System.out.println("runCount = "+runCount);
 	   /* for debug java.io.FileWriter file;
 		try {
@@ -235,7 +196,6 @@ public class CAStatic extends JFrame implements Runnable, ActionListener {
 			e.printStackTrace();
 		}*/
 
-		}
 	}
 	
 	public void outputEPS(){
@@ -244,8 +204,8 @@ public class CAStatic extends JFrame implements Runnable, ActionListener {
 	  //postscriptPrint("CA"+iterations+"."+probstring+"."+epsCount+".eps");
 	  //EPSFilename = "CA"+maxit+"_"+probstring+"_"+epsCount+".eps";
 	  outPrinter.makeFilenames();
-	  outPrinter.printEPSDots();
-	  outPrinter.printLaTeX();
+	  outPrinter.printEPSDots(dsize-1);
+	  outPrinter.printLaTeX(dsize-1);
 	}
 	
 	public void changeParameters(){
@@ -273,37 +233,34 @@ public class CAStatic extends JFrame implements Runnable, ActionListener {
 	    CApicture.updateGraphic();
 	}
 	
-	public void drawCount(int ind) {		
-		CApicture.drawCircleAt(ind,dCount[ind],javaColours[1],2);
+	public void drawCount(int ind) {
+		int xv = saved[ind].d[runCount];
+		int a = saved[ind].lineage;
+		a = (a-1)%nnw+1;
+		CApicture.drawCircleAt(xv,saved[ind].dCount[xv],javaColours[a],2);
 	    CApicture.updateGraphic();
 	}
-	
-	public void drawLines() {
 
-			if (iterations > 0) {
-				CApicture.drawALine(experiment.savedx[iterations-1],iterations-1,
-						experiment.savedx[iterations],iterations,javaColours[1]);
-	    CApicture.updateGraphic();
-			}
-	}
 
 	public void drawLines(int it,int runnum){
+		int a;
+		for (int c = 0;c<experiment.maxlineage;c++){
+			a = saved[c].lineage;
+			a = (a-1)%nnw+1;
 		for (int i = lastDrawn; i < runnum; i++) {
 			for (int yy = 1; yy < it; yy++) {
-				CApicture.drawALine(savedvals[i][yy-1],yy-1,
-						savedvals[i][yy],yy,javaColours[1]);
+				CApicture.drawALine(saved[c].posx[i][yy-1],yy-1,
+						saved[c].posx[i][yy],yy,javaColours[a]);
 			}
+		}
 		}
 		lastDrawn = runCount;
 	    CApicture.updateGraphic();
 	}
 	
 	public void start() {
-        //initialise();
+		initialise();
 		lastDrawn = 0;
-	    savedd = new int[maxRun];
-	    saveddsq = new int[maxRun];
-	    dCount = new int[gSize]; ;
         started = true;
 		if (runner == null) {
 			runner = new Thread(this);
@@ -353,13 +310,13 @@ public class CAStatic extends JFrame implements Runnable, ActionListener {
 		for (runCount=0;runCount<maxRun;runCount++){
 			running = (runner == Thread.currentThread());
 			if (running){
-				initialise();
+				if (runCount > 0) reset();
 				saveCA();
 				iterations++;
 				while ((iterations < maxit)) {
 					experiment.iterate();
 					saveCA();
-					drawCA();
+					//drawCA();
 					//if ((runCount%10) == 0) 
 					//drawLines();
 					iterations++;
@@ -369,8 +326,8 @@ public class CAStatic extends JFrame implements Runnable, ActionListener {
 					// This will produce a postscript output of the tissue
 				}
 				tmprCount = runCount;
-				saveStats();
-				//if ((runCount%25) == 0) drawLines(maxit,runCount);
+				saverunStats();
+				if ((runCount%25) == 0) drawLines(maxit,runCount);
 			}
 
 		}
@@ -384,14 +341,37 @@ public class CAStatic extends JFrame implements Runnable, ActionListener {
 
 
 	public void initialise(){
-		experiment = new CAGridStatic(gSize,maxit,dsize);
-		
-		//change call to setScale if just using 1 image
-		if (runCount < 1) {
+		int stuffind = 0;
+
+		    runCount = 0;
+
+		    int a;
+
+			experiment = new CAGridStatic(gSize,maxit,dsize);
+
 			CApicture.setScale(gSize,maxit,scale,gSize,rowstoDraw,scale);
+
       	    CApicture.clearCAPanel(1);
+
       	    CApicture.clearCAPanel(2);
-		}
+
+		    iterations=0;
+
+		    saved = new Results[experiment.maxlineage];
+
+		    for (CACell c:experiment.tissue){
+
+		    	a = c.lineage;
+
+                if (a > 0 ){
+				    saved[a-1] = new Results(maxRun,maxit,a, gSize);
+
+                }
+			}
+
+	}
+	public void reset(){
+        experiment.reSet(maxit,dsize);
 		iterations=0;
 
 	}
@@ -406,7 +386,7 @@ public class CAStatic extends JFrame implements Runnable, ActionListener {
 /*	        s.initialise();
 			s.start();*/
 		}else{
-			CAStatic s = new CAStatic(6);
+			CAStatic s = new CAStatic(3);
 /*	        s.initialise();
 			s.start();*/
 			System.out.println("finished");//one thread gets here

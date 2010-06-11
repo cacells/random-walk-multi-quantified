@@ -6,13 +6,13 @@ import java.util.*;
  
 public class CAGridStatic {
 	
-    int[] savedx;
-    int[][] savedxs;
-    int[] savedy;
+    int[] lineages;
+    int[] types;
 	public ArrayList <CACell> tissue;// List of cells that make up the tissue
 	public static ParamVals params = new ParamVals();//parameters of the experiment 
 	//cells may actually be spaces (type = 0)
 	private Random rand = new Random();
+	int maxlineage = 1;
 	
 	public CAGridStatic(int size,int maxit,int dsize) {// Create new instance of simulation with size of grid maximum CA cycle and fraction of stem cells 
         //uncomment for interactive setup params.SetParamVals();//set param vals using windows
@@ -22,23 +22,29 @@ public class CAGridStatic {
 		tissue = new ArrayList<CACell>();// Creates the list structure for the cells that constitute the tissue
 		int lineage =0;
 		int ttype;
+		lineages = new int[size];
+		types = new int[size];
+		maxlineage = dsize;//this could change if setting cells up randomly
+		for (int x = 0; x < maxit; x++) {
+			lineages[x] = 0;
+			types[x] = 0;
+		}
+		for (int x = maxit; x < (maxit+dsize); x++) {
+			lineage++;
+			lineages[x] = lineage;
+			types[x] = 1;
+		}
+		for (int x = (maxit+dsize); x < size; x++) {
+			lineages[x] = 0;
+			types[x] = 0;
+		}
 		// Grid looped through and new CABox and CACell created for each element in the array
 		for (int x = 0; x < size; x++) {
 			//ttype=rand.nextInt(2);// Cell type set randomly to either 0 or 1
-            ttype = 0;
-            if ((x>=maxit) && (x < (maxit+dsize)))ttype = 1;
 			grid[x][0] = new CABoxStatic(x,0);// New instance of CABox created and added to 2D grid
-		    if (ttype == 1){
-				lineage++;//lineage starts at 1
-		    	cell = new CACell(grid[x][0],lineage);// New instance of CACell created and given unique lineage id
-                cell.type = ttype;
+		    	cell = new CACell(grid[x][0],lineages[x]);// New instance of CACell created and given unique lineage id
+                cell.type = types[x];
 		    	grid[x][0].occupant = cell;// The new cell is added to the CABox              
-		    }
-			else{
-				cell = new CACell(grid[x][0],0);// New instance of CACell created and given unique lineage id
-                cell.type = ttype;
-				grid[x][0].occupant = cell;// The new cell is added to the CABox
-			}
 			tissue.add(cell);// Add new cell to list of cells that constitute the tissue
 	}
 		//System.out.println("max lineage "+lineage);
@@ -53,11 +59,21 @@ public class CAGridStatic {
 			
 	    } 
 		
-		savedx = new int[maxit];
-		savedxs = new int[dsize][maxit];
-		savedy = new int[maxit];
+
 	}
 
+	public void reSet(int maxit, int dsize){
+		int xv;
+		for (CACell c:tissue){
+			xv = c.home.x;
+			//reset type and lineage
+			c.type = types[xv];
+			c.lineage = lineages[xv];
+		}
+
+
+	}
+	
 	private int bounds(int a,int size) {  // Creates the toroidal links between top and bottom and left and right
 		if (a < 0) return size + a;
 		if (a >= size) return a - size;

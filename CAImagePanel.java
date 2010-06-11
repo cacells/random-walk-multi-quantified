@@ -16,6 +16,10 @@ class CAImagePanel extends JPanel {
 		float frac = 1.0f;
 		boolean twoImage = false;
 		int rowstoShow = 100;
+		int cind = 7;
+		Colour tcolor = new Colour();
+		Color Jcolor = tcolor.chooseJavaColour(cind);
+		double[] EPScolor = tcolor.chooseEPSColour(cind);
 
 		public void setScale(int noColumns,int noRows, int scale)//just one image
 		{
@@ -61,12 +65,13 @@ class CAImagePanel extends JPanel {
 		}
 		public void clearCAPanel(int panelNum)
 		{
+
 			if (panelNum == 1){
 				backGr.setColor(Color.white);
 				backGr.fillRect(0,0,xScale*columns,yScale*rows);
 			}
 			if (panelNum == 2){
-				backGr2.setColor(Color.lightGray);
+				backGr2.setColor(Jcolor);
 				backGr2.fillRect(0,0,xScale2*columns2,yScale2*rows2);
 			}
 		}
