@@ -17,17 +17,28 @@ public class ResultsPrinter {
     static 	DecimalFormat twoPlaces = new DecimalFormat("0.00");
     File dir;
     static int resultcount = 0;
+    static int maxdots = 50;//max size of histogram
+    int sf = 1;
 	public ResultsPrinter(CAStatic orig){
 		c = orig;
 		//set date and create directory?
 	}
-public void printLaTeX(int ind){
-
+	
+public void printLaTeX(int ind,boolean multi){
 		try {
+			int startind;
+			int lastind;
 			java.io.FileWriter file = new java.io.FileWriter(new File(dir,latexFilename));
 			java.io.BufferedWriter buffer = new java.io.BufferedWriter(file);
 			System.out.println(latexFilename);
-	
+			if (multi) {
+				startind = 0;
+				lastind = ind;
+			}
+			else {
+				startind = ind;
+				lastind = ind+1;
+			}
 			buffer.write("\\documentclass[11pt,a4paper]{article}\n");
 			buffer.write("\n");
 			buffer.write("\\usepackage{longtable}\n");
@@ -63,25 +74,32 @@ public void printLaTeX(int ind){
 			buffer.write("\\colorbox{descriptbg}{\\large{Theoretical Values}}\n");
 			buffer.write("\n");
 			buffer.write("\\bt\n");
-			buffer.write("expected distance travelled in "+c.maxit+" moves &" +twoPlaces.format(c.runStats[0])+"\\\\\n");
-			buffer.write("expected mean square distance for "+c.maxit+" moves &"+ twoPlaces.format(c.runStats[1])+"\\\\\n");
+			buffer.write("expected distance travelled in "+c.maxit+" non-blocked moves &" +twoPlaces.format(c.runStats[0])+"\\\\\n");
+			buffer.write("expected mean square distance for "+c.maxit+" non-blocked moves &"+ twoPlaces.format(c.runStats[1])+"\\\\\n");
 			buffer.write("\\et\n");
 			buffer.write("\\colorbox{descriptbg}{\\large{Measured Values}}\n");
-			buffer.write("\\bt\n");
-			buffer.write("average distance travelled in "+c.maxit+" moves &  " +twoPlaces.format(c.saved[ind].cellStats[0])+"\\\\\n");
-			buffer.write("average square distance for "+c.maxit+" moves & " +twoPlaces.format(c.saved[ind].cellStats[1])+"\\\\\n");
-			buffer.write("maximum frequency of distance & " +twoPlaces.format(c.saved[ind].cellStats[2])+"\n");
-			buffer.write("\\et\n");
-			buffer.write("\\colorbox{descriptbg}{\\large{Visualisation of results}}\n");
-			buffer.write("\\begin{figure}[htbp]\n");
-			buffer.write("\\begin{center}\n");
-			buffer.write("\\includegraphics[width=0.8\\textwidth]{"+EPSFilename+"}\n");
-			buffer.write("\\caption{Upper panel shows cell pathways with vertical position representing timestep. \n");
-			buffer.write("Lower panel shows the distribution of final (horizontal) cell positions.}\n");
-			buffer.write("\\label{fig1}\n");
-			buffer.write("\\end{center}\n");
-			buffer.write("\\end{figure}\n");
-			buffer.write("\n");
+			for (int i=startind;i<lastind;i++){
+				buffer.write("\\subsection*{Cell "+i+"}\n");	
+				buffer.write("\\bt\n");			
+				buffer.write("average distance travelled in "+c.maxit+" moves &  " +twoPlaces.format(c.saved[i].cellStats[0])+"\\\\\n");
+				buffer.write("average square distance for "+c.maxit+" moves & " +twoPlaces.format(c.saved[i].cellStats[1])+"\\\\\n");
+				buffer.write("maximum frequency of distance & " + ((int)c.saved[i].cellStats[2])+"\\\\\n");
+				buffer.write("pathways and frequency histogram & Figure \\ref{fig" +i+"}\n");
+				buffer.write("\\et\n");
+				//buffer.write("\\colorbox{descriptbg}{\\large{Visualisation of results}}\n");
+				buffer.write("\\begin{figure}[htbp]\n");
+				buffer.write("\\begin{center}\n");
+				makeEPSFilename(i);
+				buffer.write("\\includegraphics[width=0.8\\textwidth]{"+EPSFilename+"}\n");
+				buffer.write("\\caption{Cell "+i+" pathways and frequency histogram. Upper panel shows cell pathways with vertical position representing timestep. \n");
+				buffer.write("Lower panel shows the distribution of final (horizontal) cell positions. Each dot in the histogram represents ");
+					if (sf > 1) buffer.write(sf+" results.}\n");
+					else buffer.write(sf+" result.}\n");
+				buffer.write("\\label{fig"+i+"}\n");
+				buffer.write("\\end{center}\n");
+				buffer.write("\\end{figure}\n");
+				buffer.write("\n");
+			}
 			buffer.write("\n");
 			buffer.write("\\end{document}\n");			
 			buffer.close();
@@ -145,7 +163,12 @@ public void printLaTeX(int ind){
 		}
 	}
 
-
+	public void makeEPSFilename(int ind){
+		EPSFilename = baseFilename+"_"+ind+".eps";
+	}
+    public void findScaleFactor(int maxdCount){
+        sf = (int) Math.ceil((double)maxdCount/(double) maxdots);
+    }
 	public void makeFilenames(){
 		Date now = new Date();
         SimpleDateFormat format =
@@ -168,13 +191,19 @@ public void printLaTeX(int ind){
 	    cssFilename = baseFilename+".css";
 	}
 	public void printEPSDots(int ind) {
+
 		int xx;
 		int yy;
 		int xsize = c.gSize*4;
-		int ysize = c.saved[ind].maxdCount*4 + 20;
+		int dotspace = (int)Math.ceil((double)c.saved[ind].maxdCount/(double) sf);
+		int ysize = dotspace*4 + 20;
 		int ysize2 = (c.maxit-1)*4 +10;
+		int dotfrac;
+		int rem = 0;
+		int todo = 0;
 		xsize = xsize + 30;
 		double[] col = new double[3];//tmp colour holder
+		makeEPSFilename(ind);
 		try {
 			java.io.FileWriter file = new java.io.FileWriter(new File(dir,EPSFilename));
 			java.io.BufferedWriter buffer = new java.io.BufferedWriter(file);
@@ -202,16 +231,27 @@ public void printLaTeX(int ind){
 			buffer.write("/fillrect {/y2 exch def /x2 exch def /y1 exch def /x1 exch def newpath x1 y1 moveto x2 y1 lineto x2 y2 lineto x1 y2 lineto closepath fill} bind def\n");
 			buffer.write("/drawrect {/y2 exch def /x2 exch def /y1 exch def /x1 exch def newpath x1 y1 moveto x2 y1 lineto x2 y2 lineto x1 y2 lineto closepath stroke} bind def\n");
 			buffer.write("/dodot {/yval exch def /xval exch def newpath xval yval 1.5 0 360 arc fill} def\n");
+			buffer.write("/dopartdot {/ang exch def /yval exch def /xval exch def newpath xval yval 1.5 0 ang arc fill} def\n");
 			//for (CACell c : experiment.tissue){
 			buffer.write("0 0 "+xsize+" "+(ysize+ysize2)+" drawrect\n");
 			buffer.write("lg\n");
 			buffer.write("5 5 "+(xsize-5)+" "+(ysize-5)+" fillrect\n");
 			int a = (ind)%c.nnw+1;
 			buffer.write("sc"+a+"\n");//colour 1 is red
+			System.out.println("sf = "+sf);
+			if (sf > 0){
 			for (xx = 0; xx < c.gSize; xx++) {
-				for (yy = 0; yy < c.saved[ind].dCount[xx]; yy++) {
+				rem = c.saved[ind].dCount[xx]%sf;
+				todo = (c.saved[ind].dCount[xx]-rem)/sf;
+				for (yy = 0; yy < todo; yy++) {
 					buffer.write( (xx*4+10) + " " + (ysize-yy*4-10) + " dodot\n");
 				}
+				//assume yy = todo. Do a part dot.
+				if (rem > 0) {
+					dotfrac = (rem*360)/sf;
+					buffer.write( (xx*4+10) + " " + (ysize-yy*4-10) + " "+dotfrac+" dopartdot\n");
+				}
+			}
 			}
             buffer.write("0 "+ysize+" translate\n");
             System.out.println("runCount from epsprint"+c.runCount);

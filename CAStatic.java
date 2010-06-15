@@ -27,7 +27,7 @@ public class CAStatic extends JFrame implements Runnable, ActionListener, Change
     //int[] saveddsq;
     //int[] dCount;
     int runCount = 0;
-    int epsCount = 0;
+    //int epsCount = 0;
     int newframe = 0;
     Random rand = new Random();    
 	volatile Thread runner;
@@ -114,7 +114,7 @@ public class CAStatic extends JFrame implements Runnable, ActionListener, Change
            cellselectMsg = new JLabel(" select cell to count:");
             //cellselectMsg.setEditable(false);
             buttonHolderlow.add(cellselectMsg);
-        	model3 = new SpinnerNumberModel(0, 0, (dsize-1), 1);
+        	model3 = new SpinnerNumberModel(celltoDraw, 0, (dsize-1), 1);
         	spinner3 = new JSpinner(model3);
         	spinner3.addChangeListener(this);
         	buttonHolderlow.add(spinner3);
@@ -209,7 +209,7 @@ public class CAStatic extends JFrame implements Runnable, ActionListener, Change
 			if (r.maxdCount > maxdCount) maxdCount = r.maxdCount;
 		}
         scalefactor = (int) Math.ceil((double)maxdCount/(double) 80);
-        if (scalefactor > 1) System.out.println("max maxdCount "+maxdCount+"scale factor "+scalefactor);
+        if (scaling && (scalefactor > 1)) System.out.println("max maxdCount "+maxdCount+"scale factor "+scalefactor);
 		System.out.println("runCount = "+runCount);
 	    java.io.FileWriter file;
 		try {
@@ -229,13 +229,16 @@ public class CAStatic extends JFrame implements Runnable, ActionListener, Change
 	}
 	
 	public void outputEPS(){
-	  epsCount++;
+	  //epsCount++;
 	  //String probstring = CAGridStatic.params.filename();	  
 	  //postscriptPrint("CA"+iterations+"."+probstring+"."+epsCount+".eps");
 	  //EPSFilename = "CA"+maxit+"_"+probstring+"_"+epsCount+".eps";
 	  outPrinter.makeFilenames();
-	  outPrinter.printEPSDots(dsize-1);
-	  outPrinter.printLaTeX(dsize-1);
+	  outPrinter.findScaleFactor(maxdCount);
+	  for (int i=0;i<experiment.maxlineage;i++){
+	      outPrinter.printEPSDots(i);
+	  }
+	  outPrinter.printLaTeX(experiment.maxlineage,true);
 	}
 	
 	public void changeParameters(){
@@ -426,23 +429,15 @@ public class CAStatic extends JFrame implements Runnable, ActionListener, Change
 
 	public void initialise(){
 		int stuffind = 0;
-
 		    runCount = 0;
-
 		    int a;
-
 			experiment = new CAGridStatic(gSize,maxit,dsize);
-
+            model3.setMaximum(experiment.maxlineage-1);//change the spinner if needed
 			CApicture.setScale(gSize,maxit,scale,gSize,rowstoDraw,scale);
-
       	    CApicture.clearCAPanel(1);
-
       	    CApicture.clearCAPanel(2);
-
 		    iterations=0;
-
 		    saved = new Results[experiment.maxlineage];
-
 		    for (CACell c:experiment.tissue){
 
 		    	a = c.lineage;
