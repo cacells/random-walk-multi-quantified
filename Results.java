@@ -37,10 +37,11 @@ public class Results {//saves and prints results from 1 run for multiple cells
     	maxdCount = 0;
     	mind = 0;
     	maxd = dCount.length-1;
+    	int startx = posx[0][0];//or posx[any][0]
     	for (int i=0;i<dCount.length;i++) if (dCount[i] > maxdCount) maxdCount = dCount[i];
     	for (int i=0;i<runCount;i++){
     		ind = d[i];
-    		val = ind - d[0];
+    		val = ind - startx;
     		sumd = sumd + val;
     		sumdsq = sumdsq + val*val;
 			if (ind < mind) mind = ind;

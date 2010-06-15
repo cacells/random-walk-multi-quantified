@@ -7,6 +7,9 @@
 import java.awt.*;
 
 import javax.swing.*;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
+
 import java.awt.event.*;
 import java.awt.geom.GeneralPath;
 import java.io.IOException;
@@ -14,11 +17,11 @@ import java.io.IOException;
 import java.text.DecimalFormat;
 import java.util.*;
  
-public class CAStatic extends JFrame implements Runnable, ActionListener {
+public class CAStatic extends JFrame implements Runnable, ActionListener, ChangeListener {
 
     CAGridStatic experiment;
     //int[][] savedvals;
-    int maxRun =100;
+    int maxRun =500;
 	int maxit = 30;
     //int[] savedd;// = new int[maxRun];
     //int[] saveddsq;
@@ -57,7 +60,7 @@ public class CAStatic extends JFrame implements Runnable, ActionListener {
     ResultsPrinter outPrinter;
     double[] runStats = new double[2];
     Results[] saved;
-    
+    SpinnerNumberModel model3;
     
 	public CAStatic(int size) {
 
@@ -83,8 +86,9 @@ public class CAStatic extends JFrame implements Runnable, ActionListener {
 		buttonHolder.setLayout(new GridLayout(2,2));
   
 		
-	    SpinnerNumberModel model3 = new SpinnerNumberModel(50, 0, 100, 5);
+	    model3 = new SpinnerNumberModel(0, 0, size, 1);
 	    JSpinner spinner3 = new JSpinner(model3);
+	    spinner3.addChangeListener(this);
         writeBtn = new JButton("Output Results to file");
         writeBtn.addActionListener(this);
  	
@@ -100,7 +104,8 @@ public class CAStatic extends JFrame implements Runnable, ActionListener {
         buttonHolder.add(writeBtn);
 		writeBtn.setVisible(false);
         buttonHolder.add(paramsBtn);
-        buttonHolder.add(wrapBtn);
+        //buttonHolder.add(wrapBtn);
+        buttonHolder.add(spinner3);
         buttonHolder.add(startBtn);
         
         mainWindow.add(buttonHolder,BorderLayout.SOUTH);
@@ -182,19 +187,20 @@ public class CAStatic extends JFrame implements Runnable, ActionListener {
 		System.out.println("maxdCount " + r.maxdCount);
         }
 		System.out.println("runCount = "+runCount);
-	   /* for debug java.io.FileWriter file;
+	    java.io.FileWriter file;
 		try {
 			file = new java.io.FileWriter("stuff.dat");
 			java.io.BufferedWriter buffer = new java.io.BufferedWriter(file);
+        	r = saved[dsize-1];
 			for (int i=0;i<runCount;i++){
-				buffer.write(savedd[i]+" "+saveddsq[i]+"\n");
+				buffer.write(r.d[i]+" "+r.dsq[i]+"\n");
 			}
 			buffer.close();
 			
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		}*/
+		}
 
 	}
 	
@@ -278,6 +284,10 @@ public class CAStatic extends JFrame implements Runnable, ActionListener {
 		writeBtn.setVisible(true);
 		paramsBtn.setVisible(true);
 	}
+    public void stateChanged(ChangeEvent e) {
+        int i = (Integer) model3.getValue();
+        System.out.println("go "+i);
+      }
 	public void actionPerformed(ActionEvent e){
 		if(e.getSource() == startBtn){
 			if(startBtn.getText()=="Start"){
@@ -386,7 +396,7 @@ public class CAStatic extends JFrame implements Runnable, ActionListener {
 /*	        s.initialise();
 			s.start();*/
 		}else{
-			CAStatic s = new CAStatic(3);
+			CAStatic s = new CAStatic(1);
 /*	        s.initialise();
 			s.start();*/
 			System.out.println("finished");//one thread gets here
