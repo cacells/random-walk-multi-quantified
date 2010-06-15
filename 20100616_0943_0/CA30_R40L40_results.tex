@@ -1,0 +1,105 @@
+\documentclass[11pt,a4paper]{article}
+
+\usepackage{longtable}
+\newcommand \bt{\begin{longtable}{p{0.65\textwidth}p{0.25\textwidth}}}
+\newcommand \et{\end{longtable}}
+ 
+\usepackage[pdftex,usenames,dvipsnames]{color}
+\usepackage{graphicx,psfig,epsfig}
+\usepackage{epstopdf}
+
+\definecolor{classbg}{rgb}{0.707,0.648,0.586}
+\definecolor{fieldbg}{rgb}{0.363,0.641,0.746}
+\definecolor{conbg}{rgb}{0.711,0.793,0.836}
+\definecolor{descriptbg}{rgb}{0.848,0.918,0.953}
+
+\usepackage[T1]{fontenc}
+\renewcommand*\familydefault{\sfdefault}
+
+\usepackage[hmargin=2.5cm,vmargin=2.5cm]{geometry}
+\setlength{\parindent}{0.0\textwidth}
+
+\begin{document}
+
+\section*{Results from 1D random walk}
+Experiment run on 16/6/2010 at 09.43\\\\\
+\colorbox{descriptbg}{\large{Parameters}}
+\bt
+Number of moves in each walk&30\\
+Number of walks &2000\\
+Probability of moving right &0.4\\
+Probability of moving left &0.4
+\et
+\colorbox{descriptbg}{\large{Theoretical Values}}
+
+\bt
+expected distance travelled in 30 non-blocked moves &0.00\\
+expected mean square distance for 30 non-blocked moves &24.00\\
+\et
+\colorbox{descriptbg}{\large{Measured Values}}
+\subsection*{Cell 0}
+\bt
+average distance travelled in 30 moves &  -4.21\\
+average square distance for 30 moves & 27.38\\
+maximum frequency of distance & 292\\
+pathways and frequency histogram & Figure \ref{fig0}
+\et
+\begin{figure}[htbp]
+\begin{center}
+\includegraphics[width=0.8\textwidth]{CA30_R40L40_0.eps}
+\caption{Cell 0 pathways and frequency histogram. Upper panel shows cell pathways with vertical position representing timestep. 
+Lower panel shows the distribution of final (horizontal) cell positions. Each dot in the histogram represents 7 results.}
+\label{fig0}
+\end{center}
+\end{figure}
+
+\subsection*{Cell 1}
+\bt
+average distance travelled in 30 moves &  -1.12\\
+average square distance for 30 moves & 7.43\\
+maximum frequency of distance & 317\\
+pathways and frequency histogram & Figure \ref{fig1}
+\et
+\begin{figure}[htbp]
+\begin{center}
+\includegraphics[width=0.8\textwidth]{CA30_R40L40_1.eps}
+\caption{Cell 1 pathways and frequency histogram. Upper panel shows cell pathways with vertical position representing timestep. 
+Lower panel shows the distribution of final (horizontal) cell positions. Each dot in the histogram represents 7 results.}
+\label{fig1}
+\end{center}
+\end{figure}
+
+\subsection*{Cell 2}
+\bt
+average distance travelled in 30 moves &  1.19\\
+average square distance for 30 moves & 7.79\\
+maximum frequency of distance & 322\\
+pathways and frequency histogram & Figure \ref{fig2}
+\et
+\begin{figure}[htbp]
+\begin{center}
+\includegraphics[width=0.8\textwidth]{CA30_R40L40_2.eps}
+\caption{Cell 2 pathways and frequency histogram. Upper panel shows cell pathways with vertical position representing timestep. 
+Lower panel shows the distribution of final (horizontal) cell positions. Each dot in the histogram represents 7 results.}
+\label{fig2}
+\end{center}
+\end{figure}
+
+\subsection*{Cell 3}
+\bt
+average distance travelled in 30 moves &  4.10\\
+average square distance for 30 moves & 26.15\\
+maximum frequency of distance & 260\\
+pathways and frequency histogram & Figure \ref{fig3}
+\et
+\begin{figure}[htbp]
+\begin{center}
+\includegraphics[width=0.8\textwidth]{CA30_R40L40_3.eps}
+\caption{Cell 3 pathways and frequency histogram. Upper panel shows cell pathways with vertical position representing timestep. 
+Lower panel shows the distribution of final (horizontal) cell positions. Each dot in the histogram represents 7 results.}
+\label{fig3}
+\end{center}
+\end{figure}
+
+
+\end{document}
