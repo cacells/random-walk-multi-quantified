@@ -8,6 +8,7 @@ public class Results {//saves and prints results from 1 run for multiple cells
     int maxdCount = 0;
     double[] cellStats = new double[3];
     int lineage = 1;
+    int firstx = 0;//gets set by first saveCA
 
     Results(int maxRun,int iters,int lin,int gSize){//set up the results arrays
     	posx = new int[maxRun][iters];
@@ -17,7 +18,7 @@ public class Results {//saves and prints results from 1 run for multiple cells
     	lineage = lin;
     }
     public void setVals(int maxRun,int iters,int lin,int gSize){//set up the results arrays
-    	System.out.println("gets to there ");
+    	//currently unused
     	posx = new int[maxRun][iters];
     	d = new int[maxRun];
     	dsq = new int[maxRun];
@@ -26,8 +27,8 @@ public class Results {//saves and prints results from 1 run for multiple cells
     }
     public void setrunStats(int runCount,int maxit){//set up the results arrays
     	int lastpos = posx[runCount][maxit];
-    	d[runCount] = lastpos;
-    	dsq[runCount] = lastpos*lastpos;
+    	d[runCount] = lastpos-firstx;
+    	dsq[runCount] = (lastpos-firstx)*(lastpos-firstx);
     	dCount[lastpos]++;
     }
     public void calcStats(int runCount){//find stats at the end of the runs
@@ -35,13 +36,12 @@ public class Results {//saves and prints results from 1 run for multiple cells
     	int sumdsq = 0;
     	int val,ind;
     	maxdCount = 0;
-    	mind = 0;
-    	maxd = dCount.length-1;
-    	int startx = posx[0][0];//or posx[any][0]
+    	maxd = 0;
+    	mind = dCount.length-1;
     	for (int i=0;i<dCount.length;i++) if (dCount[i] > maxdCount) maxdCount = dCount[i];
     	for (int i=0;i<runCount;i++){
-    		ind = d[i];
-    		val = ind - startx;
+    		val = d[i];
+    		ind = val + firstx;
     		sumd = sumd + val;
     		sumdsq = sumdsq + val*val;
 			if (ind < mind) mind = ind;

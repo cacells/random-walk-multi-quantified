@@ -113,7 +113,7 @@ public Color chooseJavaColour(int index){
 	g = (int)(255*vals[index][1]);
 	b = (int)(255*vals[index][2]);
 	chosen = new Color(r,g,b);
-	System.out.println(r+" "+g+" "+b);
+	//System.out.println(r+" "+g+" "+b);
 	return chosen;
 }
 

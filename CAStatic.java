@@ -140,7 +140,7 @@ public class CAStatic extends JFrame implements Runnable, ActionListener, Change
     	javaColours = new Color[ind];
     	epsColours = new double[ind][3];
     	for (int i=0;i<ind;i++){
-    		System.out.println("color index "+colorindices[i]);
+    		//System.out.println("color index "+colorindices[i]);
     		javaColours[i] = palette.chooseJavaColour(colorindices[i]);
     		epsColours[i] = palette.chooseEPSColour(colorindices[i]);
     	}
@@ -156,6 +156,7 @@ public class CAStatic extends JFrame implements Runnable, ActionListener, Change
 			//savedvals[xv][yv] = a;
 			if (c.type == 1){
 				saved[a].posx[runCount][iterations] = c.home.x;
+				if ((runCount == 0) && (iterations == 0))saved[a].firstx = c.home.x;
 			}
 		}
 	}
@@ -240,7 +241,7 @@ public class CAStatic extends JFrame implements Runnable, ActionListener, Change
 	}
 	
 	public void drawCount(int ind) {
-		int xv = saved[ind].d[runCount];
+		int xv = saved[ind].posx[runCount][maxit-1];
 		int a = saved[ind].lineage;
 		a = (a-1)%nnw+1;
 		CApicture.drawCircleAt(xv,saved[ind].dCount[xv],javaColours[a],2);
