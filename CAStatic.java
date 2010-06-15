@@ -35,9 +35,10 @@ public class CAStatic extends JFrame implements Runnable, ActionListener, Change
 	Graphics backGr1;
 	CAImagePanel CApicture;
 	//CAImagePanel CApicture2;
-	JButton startBtn,writeBtn,paramsBtn,wrapBtn;
-	JTextArea msgBtn;
-	JPanel buttonHolder;
+	JButton startBtn,writeBtn,paramsBtn,scaleBtn;
+	JTextArea msgBtn,progressMsg;
+	JLabel cellselectMsg;
+	JPanel buttonHolderlow,buttonHolderhigh;
 	int iterations;
 	int scale = 20;
 	int gSize;
@@ -49,6 +50,8 @@ public class CAStatic extends JFrame implements Runnable, ActionListener, Change
 	//int linx = maxit + 1;
 
 	boolean started = false;
+	boolean scaling = false;
+	int scalefactor = 1;
     Colour palette = new Colour();
 	int[] colorindices = {0,1,2,54,4,5};
 	int nnw = colorindices.length-1;
@@ -56,17 +59,21 @@ public class CAStatic extends JFrame implements Runnable, ActionListener, Change
     Color[] javaColours;
     double[][] epsColours;
     String EPSFilename = "file.eps";
-    int rowstoDraw = 60;
+    int rowstoDraw = 80;
     ResultsPrinter outPrinter;
     double[] runStats = new double[2];
     Results[] saved;
     SpinnerNumberModel model3;
+    JSpinner spinner3;
+    int celltoDraw;
+
     
 	public CAStatic(int size) {
 
 		//size is the size of the area containing cells
 		dsize = size;
 	    gSize=size+2*maxit;
+	    celltoDraw = dsize-1;
 
 	    int wscale = 6;//scale for main panel
 	    int btnHeight = 480-384;//found by trial and error - must be a better way!
@@ -82,13 +89,12 @@ public class CAStatic extends JFrame implements Runnable, ActionListener, Change
 		mainWindow.setLayout(new BorderLayout());
 		setSize(gSize*wscale,tint);
 
-		buttonHolder = new JPanel();
-		buttonHolder.setLayout(new GridLayout(2,2));
-  
-		
-	    model3 = new SpinnerNumberModel(0, 0, size, 1);
-	    JSpinner spinner3 = new JSpinner(model3);
-	    spinner3.addChangeListener(this);
+		buttonHolderlow = new JPanel();
+		buttonHolderlow.setLayout(new GridLayout(2,2));
+ 
+		buttonHolderhigh = new JPanel();
+		buttonHolderhigh.setLayout(new GridLayout(1,2));
+
         writeBtn = new JButton("Output Results to file");
         writeBtn.addActionListener(this);
  	
@@ -98,23 +104,38 @@ public class CAStatic extends JFrame implements Runnable, ActionListener, Change
         paramsBtn = new JButton("Set Probabilities");
         paramsBtn.addActionListener(this);
         
-        wrapBtn = new JButton("Toggle wrap");
-        wrapBtn.addActionListener(this);
+        scaleBtn = new JButton("Scale to Fit");
+        scaleBtn.addActionListener(this);
         
-        buttonHolder.add(writeBtn);
-		writeBtn.setVisible(false);
-        buttonHolder.add(paramsBtn);
-        //buttonHolder.add(wrapBtn);
-        buttonHolder.add(spinner3);
-        buttonHolder.add(startBtn);
-        
-        mainWindow.add(buttonHolder,BorderLayout.SOUTH);
-		
-        msgBtn = new JTextArea(" Default Parameter Values: "+CAGridStatic.params);
-        msgBtn.setEditable(false);
 
+ 
+        //buttonHolderlow.add(scaleBtn);		
+        if (dsize > 1){
+           cellselectMsg = new JLabel(" select cell to count:");
+            //cellselectMsg.setEditable(false);
+            buttonHolderlow.add(cellselectMsg);
+        	model3 = new SpinnerNumberModel(0, 0, (dsize-1), 1);
+        	spinner3 = new JSpinner(model3);
+        	spinner3.addChangeListener(this);
+        	buttonHolderlow.add(spinner3);
+        }
+        buttonHolderlow.add(paramsBtn);
+        buttonHolderlow.add(startBtn);   
+        buttonHolderlow.add(writeBtn);
+		writeBtn.setVisible(false);
+        buttonHolderlow.add(scaleBtn);
+		scaleBtn.setVisible(false);
+		
+        mainWindow.add(buttonHolderlow,BorderLayout.SOUTH);
+   
+        progressMsg = new JTextArea("PROGRESS "+runCount+"%");
+        progressMsg.setEditable(false);
+        buttonHolderhigh.add(progressMsg);
+        msgBtn = new JTextArea("Probabilities: "+CAGridStatic.params);
+        msgBtn.setEditable(false);
+        buttonHolderhigh.add(msgBtn);
         
-	    mainWindow.add(msgBtn,BorderLayout.NORTH);
+	    mainWindow.add(buttonHolderhigh,BorderLayout.NORTH);
 	    
         CApicture = new CAImagePanel();
         CApicture.rowstoShow = rowstoDraw;
@@ -164,7 +185,7 @@ public class CAStatic extends JFrame implements Runnable, ActionListener, Change
 	
 	public void saverunStats() {
         for (int i=0;i<experiment.maxlineage;i++) saved[i].setrunStats(runCount, maxit-1);
-		drawCount(dsize-1);//well, you can only draw 1 of them
+		drawCount();//well, you can only draw 1 of them
 	}
 	
 	public void showStats(){
@@ -179,14 +200,16 @@ public class CAStatic extends JFrame implements Runnable, ActionListener, Change
 		runStats[1] = (maxit*(p+q) + maxit*(maxit-1)*Math.pow(p-q, 2.0));//expected dsq
 		System.out.println("expected d: "+ twoPlaces.format(runStats[0]) +" expected dsq " + twoPlaces.format(runStats[1]));
 
-        for (int i=0;i<experiment.maxlineage;i++) {
-        	r = saved[i];
-        	r.calcStats(runCount);
-        	
-		System.out.println("cell "+r.lineage+" av d: "+twoPlaces.format(r.cellStats[0])+" av d sq "+twoPlaces.format(r.cellStats[1]));
-		System.out.println("range of d: "+ r.mind + " to " + r.maxd);
-		System.out.println("maxdCount " + r.maxdCount);
-        }
+		for (int i=0;i<experiment.maxlineage;i++) {
+			r = saved[i];
+			r.calcStats(runCount);
+			System.out.println("cell "+r.lineage+" av d: "+twoPlaces.format(r.cellStats[0])+" av d sq "+twoPlaces.format(r.cellStats[1]));
+			System.out.println("range of d: "+ r.mind + " to " + r.maxd);
+			System.out.println("maxdCount " + r.maxdCount);
+			if (r.maxdCount > maxdCount) maxdCount = r.maxdCount;
+		}
+        scalefactor = (int) Math.ceil((double)maxdCount/(double) 80);
+        if (scalefactor > 1) System.out.println("max maxdCount "+maxdCount+"scale factor "+scalefactor);
 		System.out.println("runCount = "+runCount);
 	    java.io.FileWriter file;
 		try {
@@ -240,17 +263,37 @@ public class CAStatic extends JFrame implements Runnable, ActionListener, Change
 	    CApicture.updateGraphic();
 	}
 	
-	public void drawCount(int ind) {
-		int xv = saved[ind].posx[runCount][maxit-1];
-		int a = saved[ind].lineage;
+	public void drawCount() {
+		int xv = saved[celltoDraw].posx[runCount][maxit-1];
+		int a = saved[celltoDraw].lineage;
 		a = (a-1)%nnw+1;
-		CApicture.drawCircleAt(xv,saved[ind].dCount[xv],javaColours[a],2);
+		//maybe draw one every n count e.g. every 5 for instance.
+		CApicture.drawCircleAt(xv,saved[celltoDraw].dCount[xv],javaColours[a],2);
+	    CApicture.updateGraphic();
+	}
+	public void redrawCount() {
+  	    CApicture.clearCAPanel(2);
+		int a = saved[celltoDraw].lineage;
+		a = (a-1)%nnw+1;
+		int xx,yy,posy=0;
+		int inc =1;
+		if (scaling) {
+			inc = scalefactor;
+		}
+		for (xx = 0; xx < gSize; xx++) {
+			posy = 1;
+			for (yy = 0; yy < saved[celltoDraw].dCount[xx]; yy=yy+inc) {
+				CApicture.drawCircleAt(xx,posy++,javaColours[a],2);
+			}
+		}
+		//maybe draw one every n count e.g. every 5 for instance.
 	    CApicture.updateGraphic();
 	}
 
-
 	public void drawLines(int it,int runnum){
 		int a;
+		int val = runCount*100/maxRun;
+		progressMsg.setText("PROGRESS "+val+"%");
 		for (int c = 0;c<experiment.maxlineage;c++){
 			a = saved[c].lineage;
 			a = (a-1)%nnw+1;
@@ -267,15 +310,25 @@ public class CAStatic extends JFrame implements Runnable, ActionListener, Change
 	
 	public void start() {
 		initialise();
+		 System.out.println("button holder size: "+buttonHolderlow.getSize());
 		lastDrawn = 0;
         started = true;
 		if (runner == null) {
 			runner = new Thread(this);
 		}
-		runner.start();//not the same as this method!
+
 		startBtn.setText("Stop");
 		writeBtn.setVisible(false);
 		paramsBtn.setVisible(false);
+		if (dsize> 1) {
+			spinner3.setVisible(false);
+			cellselectMsg.setVisible(false);
+		}
+		scaleBtn.setVisible(false);
+		scalefactor = 1;
+		scaleBtn.setText("Scale to Fit");
+		scaling = false;
+		runner.start();//not the same as this method!
 	}
 	public void stop(){
 		started = false;
@@ -283,11 +336,18 @@ public class CAStatic extends JFrame implements Runnable, ActionListener, Change
 
 		startBtn.setText("Start");
 		writeBtn.setVisible(true);
+		scaleBtn.setVisible(true);
 		paramsBtn.setVisible(true);
+		if (dsize> 1) {
+			spinner3.setVisible(true);
+			cellselectMsg.setVisible(true);
+		}
 	}
     public void stateChanged(ChangeEvent e) {
         int i = (Integer) model3.getValue();
-        System.out.println("go "+i);
+        //System.out.println("cell to draw "+i);
+        celltoDraw = i;
+        if (runCount != 0) redrawCount();
       }
 	public void actionPerformed(ActionEvent e){
 		if(e.getSource() == startBtn){
@@ -310,8 +370,17 @@ public class CAStatic extends JFrame implements Runnable, ActionListener, Change
 			start();
 
 			}
-		else if(e.getSource() == wrapBtn){
-			changeWrap();
+		else if(e.getSource() == scaleBtn){
+			if(!scaling){
+				scaling = true;
+				scaleBtn.setText("remove scaling");
+				redrawCount();
+			}
+			else{
+				scaling = false;
+				scaleBtn.setText("Scale to Fit");
+				redrawCount();
+			}
 		}
 	}
 	
@@ -319,6 +388,7 @@ public class CAStatic extends JFrame implements Runnable, ActionListener, Change
 		int tmprCount = 0;
 		boolean running = true;
 		for (runCount=0;runCount<maxRun;runCount++){
+
 			running = (runner == Thread.currentThread());
 			if (running){
 				if (runCount > 0) reset();
@@ -338,7 +408,9 @@ public class CAStatic extends JFrame implements Runnable, ActionListener, Change
 				}
 				tmprCount = runCount;
 				saverunStats();
-				if ((runCount%25) == 0) drawLines(maxit,runCount);
+				if ((runCount%25) == 0) {
+					drawLines(maxit,runCount);
+				}
 			}
 
 		}
@@ -346,6 +418,7 @@ public class CAStatic extends JFrame implements Runnable, ActionListener, Change
 		//to stop that check if maxit was achieved
 		if (!started) runCount = tmprCount+1;//just in case stop was pressed
 		//iterations should anyway be equal to maxit
+		drawLines(maxit,runCount);
 		showStats();
 		stop();
 	}
@@ -397,14 +470,12 @@ public class CAStatic extends JFrame implements Runnable, ActionListener, Change
 /*	        s.initialise();
 			s.start();*/
 		}else{
-			CAStatic s = new CAStatic(1);
+			CAStatic s = new CAStatic(4);
 /*	        s.initialise();
 			s.start();*/
 			System.out.println("finished");//one thread gets here
 		}
 	}
-
-
 	
 	}
 

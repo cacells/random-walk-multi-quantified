@@ -92,6 +92,28 @@ class CAImagePanel extends JPanel {
 				backGr2.fillOval(x*xScale2,y*yScale2,xScale2,yScale2);
 			}
 		}
+		public void drawProgress(int val, int maxval, Color colour,int panelNum)
+		//draw a progress bar in the corner	
+		{
+			int sizex = 5;
+			int xval1,xval2;
+			if (panelNum == 1){
+				xval1 = (sizex*val*xScale)/maxval;
+				xval2 = sizex*xScale - xval1;
+				backGr.setColor(colour);
+				backGr.fillRect(10,0,xval1,yScale);
+				backGr.setColor(Color.lightGray);
+				backGr.fillRect(xval1+10,0,xval2,yScale);		
+			}
+			if (panelNum == 2){
+				xval1 = (sizex*val*xScale2)/maxval;
+				xval2 = sizex*xScale2-xval1;
+				backGr.setColor(colour);
+				backGr.fillRect(10,0,xval1,yScale2);
+				backGr.setColor(Color.white);
+				backGr.fillRect(xval1+10,0,xval2,yScale2);	
+			}
+		}
 		
 		public void drawALine(int x1, int y1, int x2, int y2,Color colour)
 		{

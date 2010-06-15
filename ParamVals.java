@@ -98,7 +98,8 @@ public class ParamVals {
 	    
 
 	}
-	public String toString(){return new String("pr: "+twoPlaces.format(pr)+" pl: "+twoPlaces.format(pl)+" ps: "+twoPlaces.format(ps));}
+	public String toString(){return new String("p: "+twoPlaces.format(pr)+" q: "+twoPlaces.format(pl));}
+	public String toString2(){return new String("pr: "+twoPlaces.format(pr)+" pl: "+twoPlaces.format(pl)+" ps: "+twoPlaces.format(ps));}
 	public String filename(){return new String("R"+asPercent.format(pr*100)+"L"+asPercent.format(pl*100));}
 	public static double readdouble(BufferedReader input,String question){
 		System.out.print(question);
