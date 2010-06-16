@@ -21,7 +21,7 @@ public class CAStatic extends JFrame implements Runnable, ActionListener, Change
 
     CAGridStatic experiment;
     //int[][] savedvals;
-    int maxRun =500;
+    int maxRun =2000;
 	int maxit = 30;
     //int[] savedd;// = new int[maxRun];
     //int[] saveddsq;
@@ -211,20 +211,7 @@ public class CAStatic extends JFrame implements Runnable, ActionListener, Change
         scalefactor = (int) Math.ceil((double)maxdCount/(double) 80);
         if (scaling && (scalefactor > 1)) System.out.println("max maxdCount "+maxdCount+"scale factor "+scalefactor);
 		System.out.println("runCount = "+runCount);
-	    java.io.FileWriter file;
-		try {
-			file = new java.io.FileWriter("stuff.dat");
-			java.io.BufferedWriter buffer = new java.io.BufferedWriter(file);
-        	r = saved[dsize-1];
-			for (int i=0;i<runCount;i++){
-				buffer.write(r.d[i]+" "+r.dsq[i]+"\n");
-			}
-			buffer.close();
-			
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+
 
 	}
 	
@@ -238,6 +225,7 @@ public class CAStatic extends JFrame implements Runnable, ActionListener, Change
 	  for (int i=0;i<experiment.maxlineage;i++){
 	      outPrinter.printEPSDots(i);
 	  }
+	  outPrinter.printData();
 	  outPrinter.printLaTeX(experiment.maxlineage,true);
 	}
 	

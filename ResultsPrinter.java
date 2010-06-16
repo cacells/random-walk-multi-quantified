@@ -1,4 +1,5 @@
 import java.io.File;
+import java.io.IOException;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -13,6 +14,7 @@ public class ResultsPrinter {
     String baseFilename = "base";
     String latexFilename = "file.tex";
     String cssFilename = "file.css";
+    String dataFilename = "file.dat";
     String timeString = "00";
     static 	DecimalFormat twoPlaces = new DecimalFormat("0.00");
     File dir;
@@ -63,7 +65,7 @@ public void printLaTeX(int ind,boolean multi){
 			buffer.write("\\begin{document}\n");
 			buffer.write("\n");
 			buffer.write("\\section*{Results from 1D random walk}\n");
-			buffer.write("Experiment run on "+timeString+"\\\\\\\\\\\n");
+			buffer.write("Experiment run on "+timeString+" Data file name "+filterForLaTex(dataFilename)+"\\\\\\\\\\\n");
 			buffer.write("\\colorbox{descriptbg}{\\large{Parameters}}\n");
 			buffer.write("\\bt\n");
 			buffer.write("Number of moves in each walk&"+c.maxit+"\\\\\n");
@@ -107,6 +109,30 @@ public void printLaTeX(int ind,boolean multi){
 			System.out.println(e.toString());
 		}
 	}
+    public void printData(){
+	    java.io.FileWriter file;
+	    Results r;
+	    int i,j,cell;
+		try {
+			file = new java.io.FileWriter(new File(dir,dataFilename));
+			java.io.BufferedWriter buffer = new java.io.BufferedWriter(file);
+			buffer.write(c.maxit+" "+c.runCount+" "+CAGridStatic.params.pr+" "+CAGridStatic.params.pl+" "+c.experiment.maxlineage+"\n");
+			for (cell=0;cell<c.experiment.maxlineage;cell++){
+				r = c.saved[cell];
+				for (i=0;i<c.runCount;i++){
+				for (j=0;j<c.maxit;j++){
+					buffer.write(r.posx[i][j]+" ");
+				}
+				buffer.write("\n");
+				}
+			}
+			buffer.close();
+			
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+    }
 	public void printCSS2col(){
         String fileName = cssFilename;
 		try {
@@ -189,6 +215,7 @@ public void printLaTeX(int ind,boolean multi){
 		EPSFilename = baseFilename+".eps";
 	    latexFilename = baseFilename+"_results.tex";
 	    cssFilename = baseFilename+".css";
+	    dataFilename = baseFilename+".dat";
 	}
 	public void printEPSDots(int ind) {
 
@@ -274,5 +301,16 @@ public void printLaTeX(int ind,boolean multi){
 		} catch (java.io.IOException e) {
 			System.out.println(e.toString());
 		}
+	}
+	public String filterForLaTex(String origString){
+		String[] toFind = {"<",">","_"};
+		String[] replacement = {"\\$<\\$","\\$>\\$","\\\\_"};
+		//crazy backslashing is necessary
+		String r,returnString = " ";
+		for (int i=0;i<toFind.length;i++){
+			r = replacement[i];
+			returnString = origString.replaceAll(toFind[i],r).trim();
+		}
+		return returnString;
 	}
 }
