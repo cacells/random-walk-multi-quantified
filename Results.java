@@ -17,14 +17,6 @@ public class Results {//saves and prints results from 1 run for multiple cells
     	dCount = new int[gSize];
     	lineage = lin;
     }
-    public void setVals(int maxRun,int iters,int lin,int gSize){//set up the results arrays
-    	//currently unused
-    	posx = new int[maxRun][iters];
-    	d = new int[maxRun];
-    	dsq = new int[maxRun];
-    	dCount = new int[gSize];
-    	lineage = lin;
-    }
     public void setrunStats(int runCount,int maxit){//set up the results arrays
     	int lastpos = posx[runCount][maxit];
     	d[runCount] = lastpos-firstx;

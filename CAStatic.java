@@ -232,7 +232,7 @@ public class CAStatic extends JFrame implements Runnable, ActionListener, Change
 	public void changeParameters(){
 		CAGridStatic.params.SetParamVals();
 	    System.out.println("param vals: "+CAGridStatic.params);
-	    msgBtn.setText(" Parameter Values: "+CAGridStatic.params);
+	    msgBtn.setText(" Probabilities: "+CAGridStatic.params);
 	}
 	
 	public void changeWrap(){
