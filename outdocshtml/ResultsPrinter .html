@@ -1,0 +1,118 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+"http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<title>Class ResultsPrinter </title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<link href="ResultsPrinter .css" rel="stylesheet" type="text/css">
+
+</head>
+
+<body>
+<table width="100%"  border="0" cellspacing="1" class="tabletype1" valign="top" >
+  <tr class="CHdr">
+    <td colspan="2">Class</td>
+  </tr>
+  <tr>
+    <td class="indent hdr ftr">ResultsPrinter </td>
+	<td class="hdr ftr">
+	  This class prints out the EPS, LaTex, and raw data files for a group of random walks</td>
+  </tr>
+  </tr>
+  <tr class=FHdr>
+    <td colspan="2">Fields</td>
+  </tr>
+  <tr>
+    <td class="indent hdr">c</td>
+    <td class="hdr"> <i>Type:     CAStatic </i><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;This is the main class. Storing a link to it here gives access to all the data required for printing. </td>
+  </tr>
+  <tr>
+    <td class="indent">EPSFilename = "file.eps"</td>
+    <td> <i>Type:     String </i><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;All the following strings are default file names which are overwritten.  </td>
+  </tr>
+  <tr>
+    <td class="indent">baseFilename = "base"</td>
+    <td> <i>Type:     String </i><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </td>
+  </tr>
+  <tr>
+    <td class="indent">latexFilename = "file.tex"</td>
+    <td> <i>Type:     String </i><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </td>
+  </tr>
+  <tr>
+    <td class="indent">cssFilename = "file.css"</td>
+    <td> <i>Type:     String </i><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </td>
+  </tr>
+  <tr>
+    <td class="indent">dataFilename = "file.dat"</td>
+    <td> <i>Type:     String </i><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </td>
+  </tr>
+  <tr>
+    <td class="indent">timeString = "00"</td>
+    <td> <i>Type:     String </i><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </td>
+  </tr>
+  <tr>
+    <td class="indent"> twoPlaces </td>
+    <td> <i>Type:     static DecimalFormat </i><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;This is used for printing floating point values to two decimal places. </td>
+  </tr>
+  <tr>
+    <td class="indent">dir</td>
+    <td> <i>Type:     File  </i><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;The directory in which to put the output files. Will be created according to the date, hour, and minute of the run. </td>
+  </tr>
+  <tr>
+    <td class="indent"> resultcount </td>
+    <td> <i>Type:     static int </i><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Currently unused. Could count the number of results written. </td>
+  </tr>
+  <tr>
+    <td class="indent">maxdots = 50</td>
+    <td> <i>Type:     static int </i><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;max size of histogram. Histograms of larger size will be scaled. This stops the eps files using too many pixels. </td>
+  </tr>
+  <tr>
+    <td class="indent ftr">sf</td>
+    <td class="ftr"> <i>Type:     int </i><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Scale factor for histogram. Must be applied for all results in the group of walks. </td>
+  </tr>
+  <tr class="ConHdr">
+    <td colspan="2">Constructors</td>
+  </tr>
+  <tr>
+    <td class="indent hdr ftr">	ResultsPrinter(CAStatic orig)</td>
+    <td class="hdr">Just points c to the current instance of CAStatic so that the results can be accessed. </td>
+  </tr>
+  <tr class="MHdr">
+    <td colspan="2">Methods</td>
+  </tr>
+  <tr>
+    <td class="indent hdr"> printLaTeX<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(int ind,boolean multi)</td>
+    <td class="hdr"> <i>Return Type: void </i><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Prints out the .tex file. </td>
+  </tr>
+  <tr>
+    <td class="indent"> printData()</td>
+    <td> <i>Return Type: void </i><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Print out all the position data to a plain text file. </td>
+  </tr>
+  <tr>
+    <td class="indent"> printCSS2col()</td>
+    <td> <i>Return Type:  void </i><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Print a css file. Not used. </td>
+  </tr>
+  <tr>
+    <td class="indent"> makeEPSFilename(int ind)</td>
+    <td> <i>Return Type:  void </i><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Create a unique EPS filename using the cell lineage. </td>
+  </tr>
+  <tr>
+    <td class="indent"> findScaleFactor<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(int maxdCount)</td>
+    <td> <i>Return Type:  void </i><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Calculate the scalefactor for the histogram. </td>
+  </tr>
+  <tr>
+    <td class="indent"> makeFilenames()</td>
+    <td> <i>Return Type:  void </i><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Create the unique directory and filenames for this group of walks using the date and time. </td>
+  </tr>
+  <tr>
+    <td class="indent"> printEPSDots(int ind) </td>
+    <td> <i>Return Type:  void </i><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Print out an EPS file showing all the walks taken by this cell and also a histogram showing frequency of final positions. </td>
+  </tr>
+  <tr>
+    <td class="indent ftr">filterForLaTex<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(String origString)</td>
+    <td class="ftr"> <i>Return Type:  String </i><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Filter a string so the special LaTex characters are escaped for the LaTex file. </td>
+  </tr>
+</table>
+</body>
+</html>
+

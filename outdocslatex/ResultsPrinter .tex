@@ -1,0 +1,93 @@
+\documentclass[11pt,a4paper]{article}
+
+\usepackage{longtable}
+\newcommand \bt{\begin{longtable}{p{0.25\textwidth}p{0.74\textwidth}}}
+\newcommand \et{\end{longtable}}
+ 
+\usepackage[pdftex,usenames,dvipsnames]{color}
+
+\definecolor{classbg}{rgb}{0.707,0.648,0.586}
+\definecolor{fieldbg}{rgb}{0.363,0.641,0.746}
+\definecolor{conbg}{rgb}{0.711,0.793,0.836}
+\definecolor{descriptbg}{rgb}{0.848,0.918,0.953}
+
+\usepackage[T1]{fontenc}
+\renewcommand*\familydefault{\sfdefault}
+
+\newcommand{\hs}{\hspace{0.5cm}}
+
+%environment for indented description
+\newenvironment{di}
+{\begin{flushright}
+\begin{minipage}{0.95\textwidth}
+\begin{description}
+}
+{\end{description}
+\end{minipage}
+\end{flushright}
+}
+
+\usepackage[hmargin=2.5cm,vmargin=2.5cm]{geometry}
+\setlength{\parindent}{0.05\textwidth}
+
+\begin{document}
+
+\noindent
+\colorbox{classbg}{\parbox{1.0\textwidth}{\Large{Class}}}
+\begin{di}
+\item[\large{ResultsPrinter}]\qquad\\
+This class prints out the EPS, LaTex, and raw data files for a group of random walks
+\end{di}
+\colorbox{fieldbg}{\parbox{1.0\textwidth}{\Large{Fields}}}\vspace{0.5cm}
+\bt
+\hs \textbf{c} & \emph{type: CAStatic}\\
+& \hs This is the main class. Storing a link to it here gives access to all the data required for printing.\\
+\hs \textbf{EPSFilename = "file.eps"} & \emph{type: String}\\
+& \hs All the following strings are default file names which are overwritten.\\
+\hs \textbf{baseFilename = "base"} & \emph{type: String}\\
+& \hs \\
+\hs \textbf{latexFilename = "file.tex"} & \emph{type: String}\\
+& \hs \\
+\hs \textbf{cssFilename = "file.css"} & \emph{type: String}\\
+& \hs \\
+\hs \textbf{dataFilename = "file.dat"} & \emph{type: String}\\
+& \hs \\
+\hs \textbf{timeString = "00"} & \emph{type: String}\\
+& \hs \\
+\hs \textbf{twoPlaces} & \emph{type: static DecimalFormat}\\
+& \hs This is used for printing floating point values to two decimal places.\\
+\hs \textbf{dir} & \emph{type: File}\\
+& \hs The directory in which to put the output files. Will be created according to the date, hour, and minute of the run.\\
+\hs \textbf{resultcount} & \emph{type: static int}\\
+& \hs Currently unused. Could count the number of results written.\\
+\hs \textbf{maxdots = 50} & \emph{type: static int}\\
+& \hs max size of histogram. Histograms of larger size will be scaled. This stops the eps files using too many pixels.\\
+\hs \textbf{sf} & \emph{type: int}\\
+& \hs Scale factor for histogram. Must be applied for all results in the group of walks.\\
+\et
+\noindent\colorbox{conbg}{\parbox{1.0\textwidth}{\Large{Constructors}}}
+\begin{di}
+\item[{ResultsPrinter(CAStatic orig)}]\qquad\\
+Just points c to the current instance of CAStatic so that the results can be accessed.
+\end{di}
+\colorbox{descriptbg}{\parbox{1.0\textwidth}{\Large{Methods}}}
+\begin{di}
+\item[{printLaTeX(int ind,boolean multi)}]\emph{Returns void}\\
+Prints out the .tex file.\\
+\item[{printData()}]\emph{Returns void}\\
+Print out all the position data to a plain text file.\\
+\item[{printCSS2col()}]\emph{Returns void}\\
+Print a css file. Not used.\\
+\item[{makeEPSFilename(int ind)}]\emph{Returns void}\\
+Create a unique EPS filename using the cell lineage.\\
+\item[{findScaleFactor(int maxdCount)}]\emph{Returns void}\\
+Calculate the scalefactor for the histogram.\\
+\item[{makeFilenames()}]\emph{Returns void}\\
+Create the unique directory and filenames for this group of walks using the date and time.\\
+\item[{printEPSDots(int ind)}]\emph{Returns void}\\
+Print out an EPS file showing all the walks taken by this cell and also a histogram showing frequency of final positions.\\
+\item[{filterForLaTex(String origString)}]\emph{Returns String}\\
+Filter a string so the special LaTex characters are escaped for the LaTex file.\\
+\end{di}
+
+\end{document}

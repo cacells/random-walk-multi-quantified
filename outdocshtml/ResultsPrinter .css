@@ -1,0 +1,45 @@
+.CHdr {
+	background-color: #B4A595;
+}
+.FHdr {
+	background-color: #5CA3BE;
+}
+.ConHdr {
+	background-color: #B5CAD5;
+}
+.MHdr {
+	background-color: #D8EAF3;
+}
+td {
+vertical-align:top
+}
+td.FList {
+width:40%
+vertical-align:top;
+}
+td.ConList {
+width:40%;
+vertical-align:top;
+}
+td.MList {
+width:40%;
+vertical-align:top;
+}
+td.midcol{
+width:20%;
+}
+td.col3 {
+width:40%
+}
+.indent {
+padding-left: 20px;
+font-weight:bold;
+}
+
+td.hdr {
+	padding-top: 10px;
+}
+td.ftr {
+	padding-bottom: 10px;
+}
+

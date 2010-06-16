@@ -1,0 +1,75 @@
+\documentclass[11pt,a4paper]{article}
+
+\usepackage{longtable}
+\newcommand \bt{\begin{longtable}{p{0.25\textwidth}p{0.74\textwidth}}}
+\newcommand \et{\end{longtable}}
+ 
+\usepackage[pdftex,usenames,dvipsnames]{color}
+
+\definecolor{classbg}{rgb}{0.707,0.648,0.586}
+\definecolor{fieldbg}{rgb}{0.363,0.641,0.746}
+\definecolor{conbg}{rgb}{0.711,0.793,0.836}
+\definecolor{descriptbg}{rgb}{0.848,0.918,0.953}
+
+\usepackage[T1]{fontenc}
+\renewcommand*\familydefault{\sfdefault}
+
+\newcommand{\hs}{\hspace{0.5cm}}
+
+%environment for indented description
+\newenvironment{di}
+{\begin{flushright}
+\begin{minipage}{0.95\textwidth}
+\begin{description}
+}
+{\end{description}
+\end{minipage}
+\end{flushright}
+}
+
+\usepackage[hmargin=2.5cm,vmargin=2.5cm]{geometry}
+\setlength{\parindent}{0.05\textwidth}
+
+\begin{document}
+
+\noindent
+\colorbox{classbg}{\parbox{1.0\textwidth}{\Large{Class}}}
+\begin{di}
+\item[\large{Results}]\qquad\\
+Results storage for a cell on a 1D random walk of length iters. Results are stored for a number (maxRun) walks of length iters.
+\end{di}
+\colorbox{fieldbg}{\parbox{1.0\textwidth}{\Large{Fields}}}\vspace{0.5cm}
+\bt
+\hs \textbf{posx} & \emph{type: int[][]}\\
+& \hs cell x position in the grid for each walk and each step of each walk. So dimensions are maxRun*iters.\\
+\hs \textbf{d} & \emph{type: int[]}\\
+& \hs d holds the distance travelled at the end of each walk.\\
+\hs \textbf{dsq} & \emph{type: int[]}\\
+& \hs d squared is just d, squared.\\
+\hs \textbf{dCount} & \emph{type: int[]}\\
+& \hs This array is the size of the (1D) grid and counts how many cells end at each grid point at the end of their walk, over the total maxRun walks.\\
+\hs \textbf{mind,maxd} & \emph{type: int}\\
+& \hs This is the range of d.\\
+\hs \textbf{maxdCount} & \emph{type: int}\\
+& \hs The maximum value in dCount which may be used to scale output or find the most probable location etc.\\
+\hs \textbf{cellStats} & \emph{type: double[]}\\
+& \hs An array to hold some statistics about this group of walks.\\
+\hs \textbf{lineage} & \emph{type: int}\\
+& \hs a cell identifier.\\
+\hs \textbf{firstx} & \emph{type: int}\\
+& \hs The grid spot at the beginning of the walk. This gets set in CAStatic (saveCA) at the beginning of the walk.\\
+\et
+\noindent\colorbox{conbg}{\parbox{1.0\textwidth}{\Large{Constructors}}}
+\begin{di}
+\item[{Results(int maxRun,int iters,int lin,int gSize)}]\qquad\\
+This constructor sets up arrays of the correct size and sets the lineage.
+\end{di}
+\colorbox{descriptbg}{\parbox{1.0\textwidth}{\Large{Methods}}}
+\begin{di}
+\item[{setrunStats(int runCount,int maxit)}]\emph{Returns void}\\
+find the distance travelled in this walk. Also calculate dsq and increment dCount at this position.\\
+\item[{calcStats(int runCount)}]\emph{Returns void}\\
+calculate the average values etc for this group of walks.\\
+\end{di}
+
+\end{document}

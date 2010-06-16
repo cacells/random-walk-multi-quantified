@@ -1,0 +1,82 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+"http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<title>Class Results</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<link href="Results.css" rel="stylesheet" type="text/css">
+
+</head>
+
+<body>
+<table width="100%"  border="0" cellspacing="1" class="tabletype1" valign="top" >
+  <tr class="CHdr">
+    <td colspan="2">Class</td>
+  </tr>
+  <tr>
+    <td class="indent hdr ftr">Results</td>
+	<td class="hdr ftr">
+	  Results storage for a cell on a 1D random walk of length iters. Results are stored for a number (maxRun) walks of length iters.</td>
+  </tr>
+  </tr>
+  <tr class=FHdr>
+    <td colspan="2">Fields</td>
+  </tr>
+  <tr>
+    <td class="indent hdr"> posx</td>
+    <td class="hdr"> <i>Type: 	int[][] </i><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;cell x position in the grid for each walk and each step of each walk. So dimensions are maxRun*iters. </td>
+  </tr>
+  <tr>
+    <td class="indent"> d</td>
+    <td> <i>Type:     int[] </i><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; d holds the distance travelled at the end of each walk. </td>
+  </tr>
+  <tr>
+    <td class="indent"> dsq</td>
+    <td> <i>Type:     int[] </i><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; d squared is just d, squared. </td>
+  </tr>
+  <tr>
+    <td class="indent"> dCount</td>
+    <td> <i>Type:     int[] </i><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; This array is the size of the (1D) grid and counts how many cells end at each grid point at the end of their walk, over the total maxRun walks. </td>
+  </tr>
+  <tr>
+    <td class="indent"> mind,maxd</td>
+    <td> <i>Type:     int </i><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; This is the range of d. </td>
+  </tr>
+  <tr>
+    <td class="indent"> maxdCount</td>
+    <td> <i>Type:     int </i><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; The maximum value in dCount which may be used to scale output or find the most probable location etc. </td>
+  </tr>
+  <tr>
+    <td class="indent"> cellStats </td>
+    <td> <i>Type:     double[] </i><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; An array to hold some statistics about this group of walks. </td>
+  </tr>
+  <tr>
+    <td class="indent"> lineage </td>
+    <td> <i>Type:     int </i><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; a cell identifier. </td>
+  </tr>
+  <tr>
+    <td class="indent ftr"> firstx </td>
+    <td class="ftr"> <i>Type:     int </i><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;The grid spot at the beginning of the walk. This gets set in CAStatic (saveCA) at the beginning of the walk. </td>
+  </tr>
+  <tr class="ConHdr">
+    <td colspan="2">Constructors</td>
+  </tr>
+  <tr>
+    <td class="indent hdr ftr">    Results(int maxRun,int iters,int lin,int gSize)</td>
+    <td class="hdr">This constructor sets up arrays of the correct size and sets the lineage. </td>
+  </tr>
+  <tr class="MHdr">
+    <td colspan="2">Methods</td>
+  </tr>
+  <tr>
+    <td class="indent hdr">setrunStats<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(int runCount,int maxit)</td>
+    <td class="hdr"> <i>Return Type:     void </i><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;find the distance travelled in this walk. Also calculate dsq and increment dCount at this position. </td>
+  </tr>
+  <tr>
+    <td class="indent ftr">calcStats(int runCount)</td>
+    <td class="ftr"> <i>Return Type:     void </i><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;calculate the average values etc for this group of walks. </td>
+  </tr>
+</table>
+</body>
+</html>
+
