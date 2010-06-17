@@ -420,7 +420,7 @@ public class CAStatic extends JFrame implements Runnable, ActionListener, Change
 		    runCount = 0;
 		    int a;
 			experiment = new CAGridStatic(gSize,maxit,dsize);
-            model3.setMaximum(experiment.maxlineage-1);//change the spinner if needed
+            if (dsize > 1) model3.setMaximum(experiment.maxlineage-1);//change the spinner if needed
 			CApicture.setScale(gSize,maxit,scale,gSize,rowstoDraw,scale);
       	    CApicture.clearCAPanel(1);
       	    CApicture.clearCAPanel(2);
@@ -453,7 +453,7 @@ public class CAStatic extends JFrame implements Runnable, ActionListener, Change
 /*	        s.initialise();
 			s.start();*/
 		}else{
-			CAStatic s = new CAStatic(4);
+			CAStatic s = new CAStatic(1);
 /*	        s.initialise();
 			s.start();*/
 			System.out.println("finished");//one thread gets here
